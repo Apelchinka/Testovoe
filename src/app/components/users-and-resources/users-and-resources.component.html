@@ -1,0 +1,46 @@
+<mat-toolbar>
+  <span>Users</span>
+</mat-toolbar>
+<ng-container *ngIf="users$ | async as users">
+  <mat-list>
+    <mat-list-item *ngFor="let user of users.data">
+      <div class="user-item" (click)="goToUser(user.id)">
+        <div class="user-image-wrapper">
+          <img
+            [src]="user.avatar"
+            [alt]="user.first_name + ' ' + user.last_name"
+          />
+        </div>
+
+        <div class="user-name">
+          {{ user.first_name + " " + user.last_name }}
+        </div>
+      </div>
+      <div class="user-delete-wrapper">
+        <mat-icon
+          aria-hidden="false"
+          aria-label="Delete"
+          fontIcon="delete_outline"
+          (click)="removeUser(user.id)"
+        ></mat-icon>
+      </div>
+    </mat-list-item>
+  </mat-list>
+  <mat-paginator
+    [length]="users.total"
+    [pageSize]="users.per_page"
+    [pageIndex]="users.page - 1"
+    (page)="changeUsersPage($event)"
+  >
+  </mat-paginator>
+</ng-container>
+<ng-container *ngIf="resources$ | async as resources">
+  <div *ngFor="let res of resources.data">{{ res.color }}</div>
+  <mat-paginator
+    [length]="resources.total"
+    [pageSize]="resources.per_page"
+    [pageIndex]="resources.page - 1"
+    (page)="changeResourcesPage($event)"
+  >
+  </mat-paginator>
+</ng-container>

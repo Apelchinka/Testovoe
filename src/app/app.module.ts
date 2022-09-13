@@ -5,26 +5,27 @@ import { RouterModule, Routes } from '@angular/router';
 import { MatPaginatorModule } from '@angular/material/paginator';
 
 import { AppComponent } from './app.component';
+import { ResourcesService } from './services/resources.service';
 import { UsersService } from './services/users.service';
-import { UsersComponent } from './users/users.component';
-import { UserComponent } from './user/user.component';
-import { GenerateNumbersPagesPipe } from './pipes/generate-numbers-pages.pipe';
+import { UsersAndResourcesComponent } from './components/users-and-resources/users-and-resources.component';
+import { UserComponent } from './components/user/user.component';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { ListService } from './services/list.service';
 
 const routes: Routes = [
-  { path: ':page', component: UsersComponent },
+  {
+    path: 'users-and-resources/:usersPage/:resourcesPage',
+    component: UsersAndResourcesComponent,
+  },
   { path: 'user/:id', component: UserComponent },
-  { path: '', redirectTo: '/1', pathMatch: 'full' },
+  { path: '', redirectTo: 'users-and-resources/1/1', pathMatch: 'full' },
 ];
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    UsersComponent,
-    UserComponent,
-    GenerateNumbersPagesPipe,
-  ],
+  declarations: [AppComponent, UsersAndResourcesComponent, UserComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -32,8 +33,10 @@ const routes: Routes = [
     MatPaginatorModule,
     MatListModule,
     MatIconModule,
+    MatCardModule,
+    MatToolbarModule,
   ],
-  providers: [UsersService],
+  providers: [UsersService, ResourcesService, ListService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
