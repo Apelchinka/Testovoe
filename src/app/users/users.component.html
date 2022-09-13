@@ -1,0 +1,30 @@
+<mat-selection-list #shoes [multiple]="false">
+  <mat-list-option *ngFor="let user of users$ | async" [value]="user">
+    <div (click)="goToUser(user.id)">
+      <!--<img
+        class="user-image"
+        [src]="user.avatar"
+        [alt]="user.first_name + ' ' + user.last_name"
+      />-->
+      <p>{{ user.first_name + " " + user.last_name }}</p>
+      <mat-icon
+        aria-hidden="false"
+        aria-label="Example home icon"
+        fontIcon="home"
+      ></mat-icon>
+    </div>
+  </mat-list-option>
+</mat-selection-list>
+<ng-container *ngIf="pages$ | async as pages">
+  <mat-paginator
+    [length]="pages.total"
+    [pageSize]="pages.per_page"
+    (page)="changePage($event)"
+  >
+  </mat-paginator>
+</ng-container>
+<mat-icon
+  aria-hidden="false"
+  aria-label="Example home icon"
+  fontIcon="home"
+></mat-icon>
