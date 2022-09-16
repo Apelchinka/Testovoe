@@ -1,5 +1,4 @@
 import {
-  HttpErrorResponse,
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
@@ -12,7 +11,8 @@ import { LoaderService } from '../loader.service';
 
 @Injectable()
 export class PendingRequestInterceptor implements HttpInterceptor {
-  private pendingReq = new Map();
+  private readonly pendingReq = new Map();
+
   constructor(private _loadService: LoaderService) {}
 
   intercept(
@@ -20,17 +20,15 @@ export class PendingRequestInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
     return next.handle(req).pipe(
+      tap((event) => {
+        if (!(event instanceof HttpResponse)) {
+          this.pendingReq.set(req, true);
+          this._loadService.loadingChange(this.pendingReq.size > 0);
+        }
+      }),
       finalize(() => {
         this.pendingReq.delete(req);
         this._loadService.loadingChange(this.pendingReq.size > 0);
-      }),
-      tap({
-        next: (event) => {
-          if (!(event instanceof HttpResponse)) {
-            this.pendingReq.set(req, true);
-            this._loadService.loadingChange(this.pendingReq.size > 0);
-          }
-        },
       })
     );
   }

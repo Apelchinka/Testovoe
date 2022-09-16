@@ -1,21 +1,13 @@
 import { Injectable } from '@angular/core';
-import {
-  distinctUntilChanged,
-  EMPTY,
-  map,
-  Observable,
-  of,
-  share,
-  switchMap,
-  throwError,
-  withLatestFrom,
-} from 'rxjs';
+import { Observable, share, switchMap, withLatestFrom } from 'rxjs';
 import { IListResponse } from '../models/list-response.model';
 import { IUser } from '../models/user.model';
 import { UsersService } from './users.service';
 import { ResourcesService } from './resources.service';
 import { IResource } from '../models/resource.model';
 import { Router } from '@angular/router';
+import { getPageNumber } from '../utils/get-page-number';
+import { checkList } from '../utils/check-list';
 
 @Injectable()
 export class ListService {
@@ -37,26 +29,15 @@ export class ListService {
     listType: 'users' | 'resources',
     routerParams$: Observable<Record<string, string>>
   ): Observable<IListResponse<IUser | IResource>> {
-    const targetPage$ = routerParams$.pipe(
-      map((routerParams) => {
-        return Number(
-          listType === 'users'
-            ? routerParams['usersPage']
-            : routerParams['resourcesPage']
-        );
-      }),
-      distinctUntilChanged()
+    const targetPage$ = getPageNumber(
+      routerParams$,
+      listType === 'users' ? 'usersPage' : 'resourcesPage'
     );
-    const concomitantPage$ = routerParams$.pipe(
-      map((routerParams) => {
-        return Number(
-          listType === 'users'
-            ? routerParams['resourcesPage']
-            : routerParams['usersPage']
-        );
-      }),
-      distinctUntilChanged()
+    const concomitantPage$ = getPageNumber(
+      routerParams$,
+      listType === 'users' ? 'resourcesPage' : 'usersPage'
     );
+
     return targetPage$.pipe(
       switchMap((pageNumbers) => {
         const listRequest$: Observable<IListResponse<IUser | IResource>> =
@@ -65,22 +46,7 @@ export class ListService {
             : this._resourcesService.getResources(pageNumbers);
         return listRequest$.pipe(withLatestFrom(concomitantPage$));
       }),
-      switchMap(([response, concomitantPage]) => {
-        if (response.data.length) {
-          return of(response);
-        } else {
-          if (response.page > 1) {
-            const redirectRoute =
-              listType === 'users'
-                ? `users-and-resources/${response.total_pages}/${concomitantPage}`
-                : `users-and-resources/${concomitantPage}/${response.total_pages}`;
-            this._router.navigate([redirectRoute]);
-            return EMPTY;
-          } else {
-            return throwError(() => 'Users not found');
-          }
-        }
-      }),
+      switchMap((result) => checkList(result, listType, this._router)),
       share()
     );
   }

@@ -3,18 +3,22 @@
   margin: 0 auto;
   padding-top: 10px;
 }
+
 .spacer {
   flex: 1 1 auto;
 }
+
 mat-toolbar {
   position: sticky;
   top: 0;
   z-index: 1;
   box-shadow: rgba(0, 0, 0, 0.2) 0 4px 6px -1px,
     rgba(0, 0, 0, 0.06) 0 2px 4px -1px;
+
   .logo {
     cursor: pointer;
   }
+
   :not(:last-child) {
     margin-right: 10px;
   }
@@ -34,6 +38,7 @@ mat-toolbar {
   right: 0;
   background-color: rgba(128, 128, 128, 0.5);
   z-index: 2;
+
   &.show {
     display: flex;
   }
@@ -51,9 +56,7 @@ mat-toolbar {
 .loader-path {
   stroke-dasharray: 150, 200;
   stroke-dashoffset: -10;
-  -webkit-animation: dash 1.5s ease-in-out infinite,
-    color 6s ease-in-out infinite;
-  animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+  animation: dash 1.5s ease-in-out infinite;
   stroke-linecap: round;
 }
 
@@ -68,28 +71,14 @@ mat-toolbar {
     stroke-dasharray: 1, 200;
     stroke-dashoffset: 0;
   }
+
   50% {
     stroke-dasharray: 89, 200;
     stroke-dashoffset: -35;
   }
+
   100% {
     stroke-dasharray: 89, 200;
     stroke-dashoffset: -124;
-  }
-}
-
-@keyframes color {
-  0% {
-    stroke: #3f51b5;
-  }
-  40% {
-    stroke: #3f51b5;
-  }
-  66% {
-    stroke: #3f51b5;
-  }
-  80%,
-  90% {
-    stroke: #3f51b5;
   }
 }

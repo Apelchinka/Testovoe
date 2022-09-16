@@ -16,15 +16,18 @@ import { ModalComponent } from '../modal/modal.component';
   styleUrls: ['./users-and-resources.component.scss'],
 })
 export class UsersAndResourcesComponent {
-  public users$: Observable<IListResponse<IUser>>;
-  public resources$: Observable<IListResponse<IResource>>;
+  public readonly users$: Observable<IListResponse<IUser>>;
+  public readonly resources$: Observable<IListResponse<IResource>>;
+
   private get currentUsersPage(): number {
     return this._activatedRoute.snapshot.params['usersPage'];
   }
   private get currentResourcePage(): number {
     return this._activatedRoute.snapshot.params['resourcesPage'];
   }
-  private _updateList = new BehaviorSubject<void>(undefined);
+
+  private readonly _updateUsersList = new BehaviorSubject<void>(undefined);
+
   constructor(
     private _listService: ListService,
     private _userService: UsersService,
@@ -63,17 +66,19 @@ export class UsersAndResourcesComponent {
       .pipe(
         take(1),
         filter((value) => value === true),
-        switchMap(() => this._userService.removeUserApi(userId.toString()))
+        switchMap(() => this._userService.removeUserApi(String(userId)))
       )
-      .subscribe(() => this._updateList.next());
+      .subscribe(() => this._updateUsersList.next());
   }
+
   private getUsers() {
-    return this._updateList.pipe(
+    return this._updateUsersList.pipe(
       switchMap(() =>
         this._listService.getList('users', this._activatedRoute.params)
       )
     );
   }
+
   private getResources() {
     return this._listService.getList('resources', this._activatedRoute.params);
   }

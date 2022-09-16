@@ -7,13 +7,15 @@ import { ApiToken } from '../tokens/api.token';
 @Injectable({ providedIn: 'root' })
 export class AuthorizationService {
   public readonly userProfile$: Observable<string | null>;
-  private _userIsAuthorized = new BehaviorSubject<string | null>(null);
+  private readonly _userIsAuthorized = new BehaviorSubject<string | null>(null);
+
   constructor(
     private _http: HttpClient,
     @Inject(ApiToken) private _api: string
   ) {
     this.userProfile$ = this._userIsAuthorized.asObservable();
   }
+
   public registration(
     email: string,
     password: string
@@ -23,6 +25,7 @@ export class AuthorizationService {
       password,
     });
   }
+
   public login(email: string, password: string): Observable<string | null> {
     return this._http
       .post<void>(`${this._api}login`, {
@@ -38,10 +41,12 @@ export class AuthorizationService {
         switchMap(() => this.checkAuth())
       );
   }
+
   public logout() {
     localStorage.removeItem('userName');
     this._userIsAuthorized.next(null);
   }
+
   public checkAuth(): Observable<string | null> {
     // десь следовало сделать запрос для проверки авторизации, но т.к. ее нет я беру данные из localstorage
     return of(localStorage.getItem('userName')).pipe(

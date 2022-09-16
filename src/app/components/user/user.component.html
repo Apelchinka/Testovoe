@@ -1,25 +1,29 @@
-<mat-card *ngIf="userData">
-  <div [formGroup]="userDataFormGroup" class="user-data-wrapper">
-    <img
-      mat-card-ld-image
-      [src]="userData.avatar"
-      [alt]="userData.first_name + ' ' + userData.last_name"
-    />
-    <ng-container *ngIf="editing | async; else view">
+<mat-card>
+  <img
+    mat-card-ld-image
+    [src]="userData.avatar"
+    [alt]="userData.first_name + ' ' + userData.last_name"
+  />
+
+  <ng-container *ngIf="editing | async; else view">
+    <form [formGroup]="userDataFormGroup" (ngSubmit)="updateUser()">
       <mat-form-field class="full-width" appearance="fill">
         <mat-label>First name</mat-label>
+
         <input
           type="text"
           matInput
           formControlName="first_name"
           placeholder="Ex. Ivan"
         />
+
         <mat-error *ngIf="firstName?.hasError('required')">
           Name is <strong>required</strong>
         </mat-error>
       </mat-form-field>
       <mat-form-field class="full-width" appearance="fill">
         <mat-label>Last name</mat-label>
+
         <input
           type="text"
           matInput
@@ -32,49 +36,57 @@
       </mat-form-field>
       <mat-form-field class="full-width" appearance="fill">
         <mat-label>Email</mat-label>
+
         <input
           type="email"
           matInput
           formControlName="email"
           placeholder="Ex. pat@example.com"
         />
+
         <mat-error
           *ngIf="email?.hasError('email') && !email?.hasError('required')"
         >
           Please enter a valid email address
         </mat-error>
+
         <mat-error *ngIf="email?.hasError('required')">
           Email is <strong>required</strong>
         </mat-error>
       </mat-form-field>
-    </ng-container>
-    <ng-template #view>
+      <mat-card-actions align="end">
+        <button
+          mat-button
+          (click)="updateUser()"
+          color="primary"
+          [disabled]="userDataFormGroup.invalid || userDataFormGroup.pristine"
+        >
+          SAVE
+        </button>
+
+        <button mat-button (click)="editingChange(false)">CANCEL</button>
+      </mat-card-actions>
+    </form>
+  </ng-container>
+
+  <ng-template #view>
+    <div class="user-data-wrapper">
       <div class="user-first-name">First name: {{ userData.first_name }}</div>
+
       <div class="user-last-name">Last name: {{ userData.last_name }}</div>
+
       <div>
         Email:
         <a class="user-email" [href]="'mailto:' + userData.email">{{
           userData.email
         }}</a>
       </div>
-    </ng-template>
-  </div>
-  <mat-card-actions align="end">
-    <ng-container *ngIf="editing | async; else edit">
-      <button
-        mat-button
-        (click)="updateUser()"
-        color="primary"
-        [disabled]="userDataFormGroup.invalid"
-      >
-        SAVE
-      </button>
-      <button mat-button (click)="editingChange(false)">CANCEL</button>
-    </ng-container>
-    <ng-template #edit>
+    </div>
+
+    <mat-card-actions align="end">
       <button mat-button (click)="editingChange(true)" color="primary">
         EDIT
       </button>
-    </ng-template>
-  </mat-card-actions>
+    </mat-card-actions>
+  </ng-template>
 </mat-card>

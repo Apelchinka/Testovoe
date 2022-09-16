@@ -19,15 +19,13 @@ import { ModalComponent } from './components/modal/modal.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SignInComponent } from './modules/authorization/components/sign-in/sign-in.component';
-import { SignUpComponent } from './modules/authorization/components/sign-up/sign-up.component';
-import { AuthorizationComponent } from './modules/authorization/authorization.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PendingRequestInterceptor } from './services/interceptors/pending-request.interceptor';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiToken } from './tokens/api.token';
-import { Environment } from '@angular/cli/lib/config/workspace-schema';
 import { environment } from '../environments/environment';
+import { UserDataResolver } from './services/resolvers/user-data.resolver';
+import { UserTitleResolver } from './services/resolvers/user-title.resolver';
 
 const routes: Routes = [
   {
@@ -40,8 +38,14 @@ const routes: Routes = [
   {
     path: 'users-and-resources/:usersPage/:resourcesPage',
     component: UsersAndResourcesComponent,
+    title: 'Users and resources',
   },
-  { path: 'user/:id', component: UserComponent },
+  {
+    path: 'user/:id',
+    component: UserComponent,
+    title: UserTitleResolver,
+    resolve: { userData: UserDataResolver },
+  },
   { path: '**', redirectTo: 'users-and-resources/1/1', pathMatch: 'full' },
 ];
 

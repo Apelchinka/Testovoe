@@ -1,22 +1,29 @@
 <mat-toolbar color="primary">
   <span class="logo" routerLink="">My App</span>
+
   <span class="spacer"></span>
+
   <ng-container *ngIf="userProfile$ | async as userProfile; else auth">
     <span class="user-name">{{ userProfile }}</span>
+
     <button mat-stroked-button (click)="logout()">Logout</button>
   </ng-container>
+
   <ng-template #auth>
     <button mat-stroked-button routerLink="authorization/sign-in">
       Sign in
     </button>
+
     <button mat-stroked-button routerLink="authorization/sign-up">
       Sign up
     </button>
   </ng-template>
 </mat-toolbar>
+
 <div class="main">
   <router-outlet></router-outlet>
 </div>
+
 <div class="loader" [class.show]="loading$ | async">
   <svg class="circular-loader" viewBox="25 25 50 50">
     <circle

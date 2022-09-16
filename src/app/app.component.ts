@@ -17,10 +17,12 @@ export class AppComponent implements OnInit {
     private _authService: AuthorizationService,
     private _loadService: LoaderService
   ) {}
-  public logout(): void {
-    this._authService.logout();
-  }
+
   ngOnInit(): void {
     this._authService.checkAuth().subscribe();
+  }
+
+  public logout(): void {
+    this._authService.logout();
   }
 }

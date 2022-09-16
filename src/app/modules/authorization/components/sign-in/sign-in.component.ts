@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { AuthorizationService } from '../../../../services/authorization.service';
 import { Router } from '@angular/router';
@@ -9,6 +9,9 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './sign-in.component.html',
 })
 export class SignInComponent {
+  public readonly userAuthData = this.createUserAuthData();
+  public errorMessage: string | null = null;
+
   public get email(): AbstractControl<string | null> | null {
     return this.userAuthData.get('email');
   }
@@ -16,11 +19,6 @@ export class SignInComponent {
     return this.userAuthData.get('password');
   }
 
-  public userAuthData = this._formBuilder.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
-  });
-  public errorMessage: string | null = null;
   constructor(
     private _formBuilder: FormBuilder,
     private _authService: AuthorizationService,
@@ -39,5 +37,12 @@ export class SignInComponent {
         }
       );
     }
+  }
+
+  private createUserAuthData() {
+    return this._formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+    });
   }
 }

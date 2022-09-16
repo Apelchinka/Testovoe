@@ -16,8 +16,8 @@ const routes: Routes = [
     path: '',
     component: AuthorizationComponent,
     children: [
-      { path: 'sign-in', component: SignInComponent },
-      { path: 'sign-up', component: SignUpComponent },
+      { path: 'sign-in', component: SignInComponent, title: 'Sign in' },
+      { path: 'sign-up', component: SignUpComponent, title: 'Sign up' },
     ],
   },
   {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { AuthorizationService } from '../../../../services/authorization.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,6 +9,8 @@ import { repeatPasswordValidator } from '../../../../utils/validators/repeat-pas
   templateUrl: './sign-up.component.html',
 })
 export class SignUpComponent {
+  public readonly userAuthData = this.createUserAuthData();
+
   public get email(): AbstractControl<string | null> | null {
     return this.userAuthData.get('email');
   }
@@ -18,17 +20,14 @@ export class SignUpComponent {
   public get passwordRepeat(): AbstractControl<string | null> | null {
     return this.userAuthData.get('password_repeat');
   }
-  public userAuthData = this._formBuilder.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]],
-    password_repeat: ['', [Validators.required, repeatPasswordValidator]],
-  });
+
   constructor(
     private _formBuilder: FormBuilder,
     private _authService: AuthorizationService,
     private _router: Router,
     private _activatedRoute: ActivatedRoute
   ) {}
+
   public signUp(): void {
     const { email, password } = this.userAuthData.value;
     if (this.userAuthData.valid && email && password) {
@@ -38,5 +37,13 @@ export class SignUpComponent {
         })
       );
     }
+  }
+
+  private createUserAuthData() {
+    return this._formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+      password_repeat: ['', [Validators.required, repeatPasswordValidator]],
+    });
   }
 }

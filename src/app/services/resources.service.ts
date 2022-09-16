@@ -15,6 +15,7 @@ export class ResourcesService {
   public getResources(page = 1): Observable<IListResponse<IResource>> {
     const params = new HttpParams().set('page', page);
     const headers = { 'Cache-Control': 'no-cache' };
+
     return this._http.get<IListResponse<IResource>>(`${this._api}unknown`, {
       params,
       headers,
