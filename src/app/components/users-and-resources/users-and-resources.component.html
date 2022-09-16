@@ -1,7 +1,7 @@
-<mat-toolbar>
-  <span>Users</span>
-</mat-toolbar>
-<ng-container *ngIf="users$ | async as users">
+<ng-container *ngIf="users$ | async as users"
+  ><mat-toolbar>
+    <span>Users</span>
+  </mat-toolbar>
   <mat-list>
     <mat-list-item *ngFor="let user of users.data">
       <div class="user-item" (click)="goToUser(user.id)">
@@ -34,8 +34,26 @@
   >
   </mat-paginator>
 </ng-container>
-<ng-container *ngIf="resources$ | async as resources">
-  <div *ngFor="let res of resources.data">{{ res.color }}</div>
+
+<ng-container *ngIf="resources$ | async as resources"
+  ><mat-toolbar>
+    <span>Resources</span>
+  </mat-toolbar>
+  <mat-list *ngFor="let res of resources.data">
+    <mat-card
+      ><mat-card-title-group>
+        <mat-card-title>{{ res.name | uppercase }}</mat-card-title>
+        <mat-card-subtitle>{{ res.color }}</mat-card-subtitle>
+        <div
+          class="resource-color"
+          style="background-color:{{ res.color }}"
+        ></div>
+      </mat-card-title-group>
+      <mat-card-content
+        >pantone value: {{ res.pantone_value }}, year: {{ res.year }}
+      </mat-card-content>
+    </mat-card>
+  </mat-list>
   <mat-paginator
     [length]="resources.total"
     [pageSize]="resources.per_page"

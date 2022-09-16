@@ -1,0 +1,14 @@
+.user-data-wrapper {
+  font-size: 25px;
+  > *:not(:last-child) {
+    margin-bottom: 5px;
+  }
+}
+
+.user-email {
+  text-decoration: none;
+}
+
+.full-width {
+  width: 100%;
+}

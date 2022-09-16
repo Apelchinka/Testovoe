@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { UsersService } from '../../services/users.service';
-import { BehaviorSubject, Observable, take } from 'rxjs';
+import { BehaviorSubject, filter, Observable, switchMap, take } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IUser } from '../../models/user.model';
 import { PageEvent } from '@angular/material/paginator';
 import { IListResponse } from '../../models/list-response.model';
 import { ListService } from '../../services/list.service';
 import { IResource } from '../../models/resource.model';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ModalComponent } from '../modal/modal.component';
 
 @Component({
   selector: 'app-users-and-resources',
@@ -27,16 +29,17 @@ export class UsersAndResourcesComponent {
     private _listService: ListService,
     private _userService: UsersService,
     private _router: Router,
-    private _activatedRoute: ActivatedRoute
+    private _activatedRoute: ActivatedRoute,
+    private _dialog: MatDialog
   ) {
-    this.users$ = this._listService.getList(
-      'users',
-      this._activatedRoute.params
-    );
-    this.resources$ = this._listService.getList(
-      'resources',
-      this._activatedRoute.params
-    );
+    this.users$ = this.getUsers();
+    this.resources$ = this.getResources();
+  }
+
+  public openDialog(): MatDialogRef<ModalComponent, boolean | undefined> {
+    return this._dialog.open<ModalComponent, boolean>(ModalComponent, {
+      width: '250px',
+    });
   }
 
   public goToUser(id: number): void {
@@ -54,12 +57,24 @@ export class UsersAndResourcesComponent {
     ]);
   }
 
-  public removeUser(userId: number) {
-    this._userService
-      .removeUserApi(userId.toString())
-      .pipe(take(1))
-      .subscribe(() => {
-        this._updateList.next();
-      });
+  public removeUser(userId: number): void {
+    this.openDialog()
+      .afterClosed()
+      .pipe(
+        take(1),
+        filter((value) => value === true),
+        switchMap(() => this._userService.removeUserApi(userId.toString()))
+      )
+      .subscribe(() => this._updateList.next());
+  }
+  private getUsers() {
+    return this._updateList.pipe(
+      switchMap(() =>
+        this._listService.getList('users', this._activatedRoute.params)
+      )
+    );
+  }
+  private getResources() {
+    return this._listService.getList('resources', this._activatedRoute.params);
   }
 }

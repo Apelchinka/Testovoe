@@ -1,0 +1,44 @@
+<h1>Sign in</h1>
+
+<form class="form" [formGroup]="userAuthData">
+  <mat-form-field appearance="fill">
+    <mat-label>Email</mat-label>
+    <input
+      type="email"
+      matInput
+      formControlName="email"
+      placeholder="Ex. pat@example.com"
+    />
+    <mat-error *ngIf="email?.hasError('email') && !email?.hasError('required')">
+      Please enter a valid email address
+    </mat-error>
+    <mat-error *ngIf="email?.hasError('required')">
+      Email is <strong>required</strong>
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>Password</mat-label>
+    <input
+      type="password"
+      matInput
+      formControlName="password"
+      placeholder="Ex. P@ssw0rd"
+      autocomplete="on"
+    />
+    <mat-error *ngIf="password?.hasError('required')">
+      Password is <strong>required</strong>
+    </mat-error>
+  </mat-form-field>
+  <div class="button-submit-wrapper">
+    <button mat-stroked-button color="primary" (click)="signIn()">
+      Sign in</button
+    ><mat-error *ngIf="errorMessage">{{ errorMessage }}</mat-error>
+  </div>
+</form>
+
+<div class="redirect-wrapper">
+  <p>
+    No account?
+    <a mat-stroked-button routerLink="../sign-up">Create an account</a>
+  </p>
+</div>
