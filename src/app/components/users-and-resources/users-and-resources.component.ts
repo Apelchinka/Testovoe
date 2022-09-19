@@ -1,6 +1,13 @@
 import { Component } from '@angular/core';
 import { UsersService } from '../../services/users.service';
-import { BehaviorSubject, filter, Observable, switchMap, take } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  Observable,
+  switchMap,
+  take,
+  takeUntil,
+} from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IUser } from '../../models/user.model';
 import { PageEvent } from '@angular/material/paginator';
@@ -9,13 +16,14 @@ import { ListService } from '../../services/list.service';
 import { IResource } from '../../models/resource.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ModalComponent } from '../modal/modal.component';
+import { AbstractDestroyableComponent } from '../../models/abstracts/abstract-destroyable.component';
 
 @Component({
   selector: 'app-users-and-resources',
   templateUrl: './users-and-resources.component.html',
   styleUrls: ['./users-and-resources.component.scss'],
 })
-export class UsersAndResourcesComponent {
+export class UsersAndResourcesComponent extends AbstractDestroyableComponent {
   public readonly users$: Observable<IListResponse<IUser>>;
   public readonly resources$: Observable<IListResponse<IResource>>;
 
@@ -35,6 +43,7 @@ export class UsersAndResourcesComponent {
     private _activatedRoute: ActivatedRoute,
     private _dialog: MatDialog
   ) {
+    super();
     this.users$ = this.getUsers();
     this.resources$ = this.getResources();
   }
@@ -66,7 +75,8 @@ export class UsersAndResourcesComponent {
       .pipe(
         take(1),
         filter((value) => value === true),
-        switchMap(() => this._userService.removeUserApi(String(userId)))
+        switchMap(() => this._userService.removeUserApi(String(userId))),
+        takeUntil(this.destroyNotifier)
       )
       .subscribe(() => this._updateUsersList.next());
   }

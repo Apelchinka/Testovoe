@@ -3,12 +3,14 @@ import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { AuthorizationService } from '../../../../services/authorization.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { repeatPasswordValidator } from '../../../../utils/validators/repeat-password.validator';
+import { takeUntil } from 'rxjs';
+import { AbstractDestroyableComponent } from '../../../../models/abstracts/abstract-destroyable.component';
 
 @Component({
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html',
 })
-export class SignUpComponent {
+export class SignUpComponent extends AbstractDestroyableComponent {
   public readonly userAuthData = this.createUserAuthData();
 
   public get email(): AbstractControl<string | null> | null {
@@ -26,16 +28,21 @@ export class SignUpComponent {
     private _authService: AuthorizationService,
     private _router: Router,
     private _activatedRoute: ActivatedRoute
-  ) {}
+  ) {
+    super();
+  }
 
   public signUp(): void {
     const { email, password } = this.userAuthData.value;
     if (this.userAuthData.valid && email && password) {
-      this._authService.registration(email, password).subscribe(() =>
-        this._router.navigate(['../sign-in'], {
-          relativeTo: this._activatedRoute,
-        })
-      );
+      this._authService
+        .registration(email, password)
+        .pipe(takeUntil(this.destroyNotifier))
+        .subscribe(() =>
+          this._router.navigate(['../sign-in'], {
+            relativeTo: this._activatedRoute,
+          })
+        );
     }
   }
 

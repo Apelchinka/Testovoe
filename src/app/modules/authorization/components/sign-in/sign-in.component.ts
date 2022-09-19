@@ -3,12 +3,14 @@ import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { AuthorizationService } from '../../../../services/authorization.service';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AbstractDestroyableComponent } from '../../../../models/abstracts/abstract-destroyable.component';
+import { takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html',
 })
-export class SignInComponent {
+export class SignInComponent extends AbstractDestroyableComponent {
   public readonly userAuthData = this.createUserAuthData();
   public errorMessage: string | null = null;
 
@@ -23,19 +25,24 @@ export class SignInComponent {
     private _formBuilder: FormBuilder,
     private _authService: AuthorizationService,
     private _router: Router
-  ) {}
+  ) {
+    super();
+  }
 
   public signIn(): void {
     const { email, password } = this.userAuthData.value;
     if (this.userAuthData.valid && email && password) {
-      this._authService.login(email, password).subscribe(
-        () => this._router.navigate(['']),
-        (error: HttpErrorResponse) => {
-          this.errorMessage =
-            error.error?.error ??
-            'Something went wrong, please try again later';
-        }
-      );
+      this._authService
+        .login(email, password)
+        .pipe(takeUntil(this.destroyNotifier))
+        .subscribe({
+          next: () => this._router.navigate(['']),
+          error: (error: HttpErrorResponse) => {
+            this.errorMessage =
+              error.error?.error ??
+              'Something went wrong, please try again later';
+          },
+        });
     }
   }
 

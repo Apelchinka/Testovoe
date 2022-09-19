@@ -5,10 +5,11 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { UsersService } from '../../services/users.service';
-import { Subject } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { IUser } from '../../models/user.model';
 import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { isIUser } from '../../utils/is-i-user';
+import { AbstractDestroyableComponent } from '../../models/abstracts/abstract-destroyable.component';
 
 @Component({
   selector: 'app-user',
@@ -16,7 +17,7 @@ import { isIUser } from '../../utils/is-i-user';
   styleUrls: ['./user.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UserComponent {
+export class UserComponent extends AbstractDestroyableComponent {
   public readonly editing = new Subject<boolean>();
   public readonly userDataFormGroup = this.createUserDataFormGroup();
   public userData: IUser;
@@ -40,6 +41,7 @@ export class UserComponent {
     private _activatedRoute: ActivatedRoute,
     private _usersService: UsersService
   ) {
+    super();
     this.userData = this._activatedRoute.snapshot.data['userData'];
   }
 
@@ -58,10 +60,13 @@ export class UserComponent {
       this.userDataFormGroup.dirty &&
       isIUser(value)
     ) {
-      this._usersService.updateUserApi(value).subscribe(() => {
-        this.userData = value;
-        this.editingChange(false);
-      });
+      this._usersService
+        .updateUserApi(value)
+        .pipe(takeUntil(this.destroyNotifier))
+        .subscribe(() => {
+          this.userData = value;
+          this.editingChange(false);
+        });
     }
   }
 
